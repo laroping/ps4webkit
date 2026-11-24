@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS4Hub — PS4Webkit Autoloader</title>
+<link rel="stylesheet" href="style.css">
+<script>
+(function () {
+  var ua = navigator.userAgent || "";
+  var m = ua.match(/PlayStation 4[ /]([\d.]+)/i);
+  var fw = m ? m[1] : "";
+  var num = fw ? parseFloat(fw) : 0;
+  var cachePage = null;
+
+  if (num === 5.05 || num === 5.07) cachePage = "cache505.html";
+  else if (num >= 7.00 && num <= 8.52) cachePage = "cache700.html";
+  else if (num >= 9.00 && num <= 9.60) cachePage = "cache900.html";
+  else if (num >= 10.00 && num <= 11.02) cachePage = "cachecss.html";
+  else if (num >= 11.50 && num <= 14.02) cachePage = "cacheslopkit.html";
+
+  window.__PS4HUB_FW__ = fw;
+  window.__PS4HUB_FWNUM__ = num;
+
+  if (cachePage && window.applicationCache && window.applicationCache.status == 0) {
+    window.location.replace(cachePage);
+  }
+})();
+</script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="tabs">
+      <span class="tab-item active">PS4Webkit</span>
+      <span class="tab-item">Autoloader</span>
+    </div>
+    <div class="telemetry">
+      <span id="fw-badge" class="tele-item tele-strong">Browser</span>
+    </div>
+  </header>
+
+  <section class="page-header">
+    <h1 class="page-title">PS4Webkit</h1>
+    <p class="page-sub">Offline exploit and GoldHEN autoloader</p>
+  </section>
+
+  <main class="columns">
+    <section class="col-left">
+      <div class="section-label">SYSTEM ENVIRONMENT</div>
+      <div class="glass-card">
+        <div class="card-band">GOLDHEN AUTOLOADER</div>
+        <div class="card-body">
+          <div class="kv-row">
+            <div class="kv-left"><span id="dot-fw" class="dot"></span>Firmware</div>
+            <div id="kv-fw" class="kv-val">Detecting...</div>
+          </div>
+          <div class="kv-row">
+            <div class="kv-left"><span class="dot"></span>Payload</div>
+            <div class="kv-val">GoldHEN v2.4b18.14</div>
+          </div>
+          <div class="kv-row">
+            <div class="kv-left"><span id="dot-cache" class="dot blue"></span>AppCache</div>
+            <div id="kv-cache" class="kv-val">Ready</div>
+          </div>
+          <div class="kv-row">
+            <div class="kv-left"><span class="dot"></span>Endpoint</div>
+            <div class="kv-val">/load/</div>
+          </div>
+
+          <div class="card-sep"></div>
+
+          <div class="card-notice">
+            <span class="notice-mark">!</span>
+            <span>The exploit launches automatically using the local browser cache when PS4Hub is closed. Reopen the browser if the run stalls.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="col-right">
+      <div class="section-label">EXPLOIT STATUS</div>
+
+      <div class="focus-card">
+        <div class="focus-row">
+          <div class="focus-text">
+            <div id="msgs">Initializing Exploit...</div>
+            <p id="status-note" class="status-note">Preparing WebKit &amp; kernel payload chain</p>
+          </div>
+          <span class="status-dot" aria-hidden="true"></span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill running"></div>
+        </div>
+      </div>
+
+      <div class="section-label spaced">SUPPORTED FIRMWARES</div>
+
+      <div class="fw-list">
+        <div id="fw-row-505" class="fw-item">
+          <div>
+            <div class="fw-main">5.05 / 5.07</div>
+            <div class="fw-sub">WebKit + Kernel Exploit</div>
+          </div>
+          <span class="fw-tag">Standby</span>
+        </div>
+        <div id="fw-row-700" class="fw-item">
+          <div>
+            <div class="fw-main">7.00 &ndash; 9.60</div>
+            <div class="fw-sub">PSFree + Lapse</div>
+          </div>
+          <span class="fw-tag">Standby</span>
+        </div>
+        <div id="fw-row-1000" class="fw-item">
+          <div>
+            <div class="fw-main">10.00 &ndash; 11.02</div>
+            <div class="fw-sub">CSS FontFace + Lapse</div>
+          </div>
+          <span class="fw-tag">Standby</span>
+        </div>
+        <div id="fw-row-1150" class="fw-item">
+          <div>
+            <div class="fw-main">11.50 &ndash; 14.02</div>
+            <div class="fw-sub">SlopKit</div>
+          </div>
+          <span class="fw-tag">Standby</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar">
+    <div class="credit">github.com/laroping</div>
+    <div class="hints">GoldHEN v2.4b18.14</div>
+  </footer>
+
+<script>
+(function () {
+  var fw = window.__PS4HUB_FW__ || "";
+  var num = window.__PS4HUB_FWNUM__ || 0;
+  var fwBadge = document.getElementById("fw-badge");
+  var kvFw = document.getElementById("kv-fw");
+  var kvCache = document.getElementById("kv-cache");
+  var dotFw = document.getElementById("dot-fw");
+  var dotCache = document.getElementById("dot-cache");
+  var msgEl = document.getElementById("msgs");
+  var noteEl = document.getElementById("status-note");
+
+  if (fwBadge) fwBadge.textContent = fw ? "FW " + fw : "Preview";
+  if (kvFw) kvFw.textContent = fw ? "PlayStation 4 (" + fw + ")" : "Not on PS4";
+
+  if (window.applicationCache) {
+    var st = window.applicationCache.status;
+    if (kvCache) kvCache.textContent = st === 0 ? "Uncached" : "Cached (" + st + ")";
+    if (dotCache) dotCache.className = st === 0 ? "dot amber" : "dot";
+  } else {
+    if (kvCache) kvCache.textContent = "Preview mode";
+    if (dotCache) dotCache.className = "dot dim";
+  }
+
+  function markFwRow(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.className = "fw-item active";
+    var tag = el.getElementsByClassName("fw-tag")[0];
+    if (tag) tag.textContent = "Active";
+  }
+
+  function loadScript(src, isModule, onLoad) {
+    var s = document.createElement("script");
+    if (isModule) s.type = "module";
+    s.src = src;
+    if (onLoad) s.onload = onLoad;
+    document.body.appendChild(s);
+  }
+
+  var supported = true;
+  if (num === 5.05 || num === 5.07) {
+    markFwRow("fw-row-505");
+    loadScript("505/exploit.js", false);
+  } else if (num >= 7.00 && num <= 8.52) {
+    markFwRow("fw-row-700");
+    loadScript("700/alert.js", true);
+  } else if (num >= 9.00 && num <= 9.60) {
+    markFwRow("fw-row-700");
+    loadScript("900/alert.js", true);
+  } else if (num >= 10.00 && num <= 11.02) {
+    markFwRow("fw-row-1000");
+    loadScript("css/main.js", false, function () {
+      setTimeout(function () {
+        if (typeof doJb === "function") doJb();
+      }, 500);
+    });
+  } else if (num === 11.50 || num === 11.52) {
+    markFwRow("fw-row-1150");
+    loadScript("slopkit/chain_lapse.js", true);
+  } else if (num >= 12.00 && num <= 14.02) {
+    markFwRow("fw-row-1150");
+    loadScript("slopkit/jb.js", true);
+  } else {
+    supported = false;
+    document.body.className = "fail";
+    if (dotFw) dotFw.className = "dot amber";
+    if (msgEl) {
+      msgEl.textContent = fw
+        ? "Unsupported Firmware: PS4 " + fw
+        : "Open This Page in the PS4 Web Browser";
+    }
+    if (noteEl) {
+      noteEl.textContent = "Supported firmware versions: 5.05, 5.07, 7.00-9.60, 10.00-11.02, 11.50-14.02";
+    }
+  }
+
+  if (supported && msgEl) {
+    msgEl.textContent = "Loading Exploit & GoldHEN...";
+    var checkState = function () {
+      var txt = msgEl.textContent || msgEl.innerText || "";
+      if (txt.indexOf("Loaded") !== -1) {
+        if (document.body.className === "") document.body.className = "done";
+        if (noteEl) {
+          noteEl.textContent =
+            txt.indexOf("Already") !== -1
+              ? "GoldHEN is already active in memory"
+              : "GoldHEN active in memory";
+        }
+        return true;
+      }
+      if (txt.indexOf("Failed") !== -1 || txt.indexOf("No offsets") !== -1) {
+        if (document.body.className === "") document.body.className = "fail";
+        if (noteEl) noteEl.textContent = "Close or restart the browser and retry";
+        return true;
+      }
+      return false;
+    };
+    if (window.MutationObserver) {
+      var obs = new MutationObserver(function () {
+        if (checkState()) obs.disconnect();
+      });
+      obs.observe(msgEl, { childList: true, characterData: true, subtree: true });
+    } else {
+      var watch = setInterval(function () {
+        if (checkState()) clearInterval(watch);
+      }, 500);
+    }
+  }
+})();
+</script>
+</body>
+</html>

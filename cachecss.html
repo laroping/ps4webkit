@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" manifest="css.manifest">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS4Hub — Offline Cache Installer (10.00–11.02)</title>
+<link rel="stylesheet" href="style.css">
+<script>
+(function () {
+  var state = { pct: 0, msg: "Installing Offline Cache...", note: "Downloading exploit and payload files into browser cache", cacheText: "Downloading...", bodyClass: "", finished: false };
+
+  function syncUI() {
+    var msgEl = document.getElementById("msgs");
+    var fillEl = document.getElementById("progress-fill");
+    var noteEl = document.getElementById("status-note");
+    var kvCache = document.getElementById("kv-cache");
+    if (fillEl) fillEl.style.width = state.pct + "%";
+    if (msgEl) msgEl.textContent = state.msg;
+    if (noteEl) noteEl.textContent = state.note;
+    if (kvCache) kvCache.textContent = state.cacheText;
+    if (document.body && state.bodyClass) document.body.className = state.bodyClass;
+  }
+
+  function finish(label) {
+    if (state.finished) return;
+    state.finished = true;
+    state.pct = 100;
+    state.msg = label;
+    state.note = "Launching GoldHEN Autoloader...";
+    state.cacheText = "Installed (css.manifest)";
+    state.bodyClass = "done";
+    syncUI();
+    try { localStorage.cachedB = "yes"; } catch (e) {}
+    try {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState({}, "", "index.html");
+      }
+    } catch (e) {}
+    setTimeout(function () {
+      window.location.replace("index.html");
+    }, 900);
+  }
+
+  function fail(label, note) {
+    state.msg = label;
+    state.note = note;
+    state.cacheText = "Unavailable";
+    state.bodyClass = "fail";
+    syncUI();
+  }
+
+  window.addEventListener("DOMContentLoaded", function () {
+    var fwBadge = document.getElementById("fw-badge");
+    var kvFw = document.getElementById("kv-fw");
+    var ua = navigator.userAgent || "";
+    var m = ua.match(/PlayStation 4[ /]([\d.]+)/i);
+    if (fwBadge) fwBadge.textContent = m ? "FW " + m[1] : "FW 10.00–11.02";
+    if (kvFw) kvFw.textContent = m ? "PlayStation 4 (" + m[1] + ")" : "FW 10.00–11.02";
+    syncUI();
+  });
+
+  var ac = window.applicationCache;
+  if (!ac) {
+    window.addEventListener("DOMContentLoaded", function () {
+      fail("Offline Cache Unsupported Here", "Open this page in the PS4 Web Browser to install the offline cache");
+    });
+    return;
+  }
+
+  ac.addEventListener("progress", function (e) {
+    if (e && e.lengthComputable && e.total > 0) {
+      state.pct = Math.round((e.loaded / e.total) * 100);
+      state.msg = "Caching Offline Files... " + state.pct + "%";
+      state.cacheText = state.pct + "%";
+      syncUI();
+    }
+  }, false);
+
+  ac.addEventListener("cached", function () { finish("Offline Cache Installed"); }, false);
+  ac.addEventListener("updateready", function () {
+    try { ac.swapCache(); } catch (e) {}
+    finish("Offline Cache Updated");
+  }, false);
+  ac.addEventListener("noupdate", function () { finish("Offline Cache Ready"); }, false);
+  ac.addEventListener("error", function () {
+    fail("Cache Failed — Retry Online", "Ensure PS4Hub HTTP server is running, clear website data if needed, and reload");
+  }, false);
+  ac.addEventListener("obsolete", function () {
+    fail("Cache Obsolete — Reload Page", "Reload this page while PS4Hub is running to refresh the cache");
+  }, false);
+})();
+</script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="tabs">
+      <span class="tab-item active">PS4Webkit</span>
+      <span class="tab-item">Offline Cache</span>
+    </div>
+    <div class="telemetry">
+      <span id="fw-badge" class="tele-item tele-strong">FW 10.00&ndash;11.02</span>
+    </div>
+  </header>
+
+  <section class="page-header">
+    <h1 class="page-title">PS4Webkit</h1>
+    <p class="page-sub">Installing offline browser cache (css.manifest)</p>
+  </section>
+
+  <main class="columns">
+    <section class="col-left">
+      <div class="section-label">CACHE ENVIRONMENT</div>
+      <div class="glass-card">
+        <div class="card-band">CACHE INSTALLER</div>
+        <div class="card-body">
+          <div class="kv-row">
+            <div class="kv-left"><span class="dot"></span>Firmware</div>
+            <div id="kv-fw" class="kv-val">FW 10.00&ndash;11.02</div>
+          </div>
+          <div class="kv-row">
+            <div class="kv-left"><span class="dot"></span>Payload</div>
+            <div class="kv-val">GoldHEN v2.4b18.14</div>
+          </div>
+          <div class="kv-row">
+            <div class="kv-left"><span class="dot blue"></span>AppCache</div>
+            <div id="kv-cache" class="kv-val">Downloading...</div>
+          </div>
+          <div class="kv-row">
+            <div class="kv-left"><span class="dot"></span>Manifest</div>
+            <div class="kv-val">css.manifest</div>
+          </div>
+          <div class="card-sep"></div>
+          <div class="card-notice">
+            <span class="notice-mark">!</span>
+            <span>Keep PS4Hub open until caching reaches 100%. Once stored, the exploit runs completely offline after reboot.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="col-right">
+      <div class="section-label">CACHE PROGRESS</div>
+
+      <div class="focus-card">
+        <div class="focus-row">
+          <div class="focus-text">
+            <div id="msgs">Installing Offline Cache...</div>
+            <p id="status-note" class="status-note">Downloading exploit and payload files into browser cache</p>
+          </div>
+          <span class="status-dot" aria-hidden="true"></span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="section-label spaced">SUPPORTED FIRMWARES</div>
+
+      <div class="fw-list">
+        <div class="fw-item">
+          <div>
+            <div class="fw-main">5.05 / 5.07</div>
+            <div class="fw-sub">WebKit + Kernel Exploit</div>
+          </div>
+          <span class="fw-tag">Standby</span>
+        </div>
+        <div class="fw-item">
+          <div>
+            <div class="fw-main">7.00 &ndash; 9.60</div>
+            <div class="fw-sub">PSFree + Lapse</div>
+          </div>
+          <span class="fw-tag">Standby</span>
+        </div>
+        <div class="fw-item active">
+          <div>
+            <div class="fw-main">10.00 &ndash; 11.02</div>
+            <div class="fw-sub">CSS FontFace + Lapse</div>
+          </div>
+          <span class="fw-tag">Active</span>
+        </div>
+        <div class="fw-item">
+          <div>
+            <div class="fw-main">11.50 &ndash; 14.02</div>
+            <div class="fw-sub">SlopKit</div>
+          </div>
+          <span class="fw-tag">Standby</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar">
+    <div class="credit">github.com/laroping</div>
+    <div class="hints">GoldHEN v2.4b18.14</div>
+  </footer>
+</body>
+</html>
