@@ -136,7 +136,7 @@ const SENT_HOME = (function () {
     try { hostAlready(); } catch (e) {}
     return true;
   }
-  /* Restored armed URL without landing referrer — silent redirect. */
+  /* Restored armed URL without landing referrer - silent redirect. */
   if (want && want !== "probe" && !FROM_LANDING) {
     try { location.replace("index.html"); } catch (e) {}
     return true;
@@ -328,7 +328,7 @@ function mark(tag, detail) {
     );
   }
 
-  /* Always write logs — visibility is CSS only. */
+  /* Always write logs - visibility is CSS only. */
   if (outEl) {
     outEl.textContent =
       lines.join("\n");
@@ -1036,7 +1036,7 @@ let mainMf = null,
       if (agOk) {
         try { sessionStorage.setItem(SESSION_DONE_KEY, "1"); } catch (e) {}
       }
-      /* Only rewrite the URL bar — do NOT navigate/reload (would OOM). */
+      /* Only rewrite the URL bar - do NOT navigate/reload (would OOM). */
       try {
         history.replaceState(null, "", "index.html");
       } catch (e) {}

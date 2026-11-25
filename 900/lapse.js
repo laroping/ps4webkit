@@ -1611,7 +1611,7 @@ async function patch_kernel(kbase, kmem, p_ucred, restore_info) {
 
     log("execute kpatch...");
     mem.cpy(write_addr, patches.addr, patches.size);
-    // ELF only runs do_patch() — restores are handled by JS below
+    // ELF only runs do_patch() - restores are handled by JS below
     sys_void("kexec", exec_addr);
 
     // RESTORE sysent[661] first, immediately after kexec returns,
